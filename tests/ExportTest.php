@@ -39,7 +39,12 @@ namespace go1\report_helpers\tests\export {
     {
         protected $s3Client;
         protected $elasticsearchClient;
+        /** @var Export */
         protected $helper;
+        protected $fields;
+        protected $headers;
+        protected $results;
+        protected $formatters;
 
         public function setUp()
         {
@@ -55,11 +60,30 @@ namespace go1\report_helpers\tests\export {
                 ->disableOriginalConstructor()
                 ->getMock();
 
-            $this->helper = $this
-                ->getMockBuilder(Export::class)
-                ->setMethods(['getValues'])
-                ->setConstructorArgs([$this->s3Client, $this->elasticsearchClient])
-                ->getMock();
+            $this->helper = new Export($this->s3Client, $this->elasticsearchClient);
+
+            $this->fields = ['field_id', 'field_key_1', 'field_key_2', 'field_key_3'];
+            $this->headers = ['ID', 'Field 1', 'Field 2', 'Field 3'];
+            $this->results = [
+                123 => [1, 2, 3],
+                234 => [2, 3, 4],
+                345 => [3, 4, 5],
+                456 => [4, 5, 6],
+            ];
+            $this->formatters = [
+                'field_id' => function ($hit) {
+                    return $hit['_id'];
+                },
+                'field_key_1' => function ($hit) {
+                    return $this->results[$hit['_id']][0];
+                },
+                'field_key_2' => function ($hit) {
+                    return $this->results[$hit['_id']][1];
+                },
+                'field_key_3' => function ($hit) {
+                    return $this->results[$hit['_id']][2];
+                },
+            ];
         }
 
         public function testDoExportAllSelected()
@@ -89,10 +113,6 @@ namespace go1\report_helpers\tests\export {
             $excludedIds = [123, 234];
             $allSelected = true;
 
-            $fields = ['field_key_1', 'field_key_2', 'field_key_3'];
-            $headers = ['ID', 'Field 1', 'Field 2', 'Field 3'];
-            $formatters = [];
-
             $this->elasticsearchClient
                 ->expects($this->once())
                 ->method('search')
@@ -100,7 +120,7 @@ namespace go1\report_helpers\tests\export {
                     'scroll' => '30s',
                     'size' => 50,
                 ])
-                ->will($this->returnValue([
+                ->will($this->returnValue(json_encode([
                     '_scroll_id' => 1234567,
                     'hits' => [
                         'hits' => [
@@ -110,7 +130,7 @@ namespace go1\report_helpers\tests\export {
                             ['_id' => 456, '_source' => ['id' => 456]],
                         ]
                     ]
-                ]));
+                ])));
             $this->elasticsearchClient
                 ->expects($this->once())
                 ->method('scroll')
@@ -118,12 +138,12 @@ namespace go1\report_helpers\tests\export {
                     'scroll_id' => 1234567,
                     'scroll' => '30s',
                 ])
-                ->will($this->returnValue([
+                ->will($this->returnValue(json_encode([
                     '_scroll_id' => 1234568,
                     'hits' => [
                         'hits' => []
                     ]
-                ]));
+                ])));
             $this->elasticsearchClient
                 ->expects($this->once())
                 ->method('clearScroll')
@@ -131,19 +151,7 @@ namespace go1\report_helpers\tests\export {
                     'scroll_id' => 1234568,
                 ]);
 
-            $this->helper
-                ->expects($this->at(0))
-                ->method('getValues')
-                ->with($fields, ['_id' => 345, '_source' => ['id' => 345]], $formatters)
-                ->will($this->returnValue([345, 3, 4, 5]));
-            $this->helper
-                ->expects($this->at(1))
-                ->method('getValues')
-                ->with($fields, ['_id' => 456, '_source' => ['id' => 456]], $formatters)
-                ->will($this->returnValue([456, 4, 5, 6]));
-            $this->helper->expects($this->exactly(2))->method('getValues');
-
-            $this->helper->doExport('s3 bucket', 's3 key', $fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters);
+            $this->helper->doExport('s3 bucket', 's3 key', $this->fields, $this->headers, $params, $selectedIds, $excludedIds, $allSelected, $this->formatters);
 
             global $csvFileContent;
             $this->assertEquals("ID,Field 1,Field 2,Field 3\n345,3,4,5\n456,4,5,6", $csvFileContent);
@@ -176,10 +184,6 @@ namespace go1\report_helpers\tests\export {
             $excludedIds = [];
             $allSelected = false;
 
-            $fields = ['field_key_1', 'field_key_2', 'field_key_3'];
-            $headers = ['ID', 'Field 1', 'Field 2', 'Field 3'];
-            $formatters = [];
-
             $this->elasticsearchClient
                 ->expects($this->once())
                 ->method('search')
@@ -207,7 +211,7 @@ namespace go1\report_helpers\tests\export {
                     'scroll' => '30s',
                     'size' => 50,
                 ])
-                ->will($this->returnValue([
+                ->will($this->returnValue(json_encode([
                     '_scroll_id' => 1234567,
                     'hits' => [
                         'hits' => [
@@ -215,7 +219,7 @@ namespace go1\report_helpers\tests\export {
                             ['_id' => 234, '_source' => ['id' => 234]],
                         ]
                     ]
-                ]));
+                ])));
             $this->elasticsearchClient
                 ->expects($this->once())
                 ->method('scroll')
@@ -223,12 +227,12 @@ namespace go1\report_helpers\tests\export {
                     'scroll_id' => 1234567,
                     'scroll' => '30s',
                 ])
-                ->will($this->returnValue([
+                ->will($this->returnValue(json_encode([
                     '_scroll_id' => 1234568,
                     'hits' => [
                         'hits' => []
                     ]
-                ]));
+                ])));
             $this->elasticsearchClient
                 ->expects($this->once())
                 ->method('clearScroll')
@@ -236,19 +240,7 @@ namespace go1\report_helpers\tests\export {
                     'scroll_id' => 1234568,
                 ]);
 
-            $this->helper
-                ->expects($this->at(0))
-                ->method('getValues')
-                ->with($fields, ['_id' => 123, '_source' => ['id' => 123]], $formatters)
-                ->will($this->returnValue([123, 1, 2, 3]));
-            $this->helper
-                ->expects($this->at(1))
-                ->method('getValues')
-                ->with($fields, ['_id' => 234, '_source' => ['id' => 234]], $formatters)
-                ->will($this->returnValue([234, 2, 3, 4]));
-            $this->helper->expects($this->exactly(2))->method('getValues');
-
-            $this->helper->doExport('s3 bucket', 's3 key', $fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters);
+            $this->helper->doExport('s3 bucket', 's3 key', $this->fields, $this->headers, $params, $selectedIds, $excludedIds, $allSelected, $this->formatters);
 
             global $csvFileContent;
             $this->assertEquals("ID,Field 1,Field 2,Field 3\n123,1,2,3\n234,2,3,4", $csvFileContent);
@@ -262,8 +254,6 @@ namespace go1\report_helpers\tests\export {
 
         public function testGetValues()
         {
-            $this->helper = new Export($this->s3Client, $this->elasticsearchClient);
-
             $fields = ['field_key_1', 'field_key_2', 'field_key_3'];
             $hit = ['_source' => ['field_key_1' => '123', 'field_key_2' => 'abc', 'field_key_3' => 'abc123', 'abc' => ['123' => 123]]];
             $formatters = [

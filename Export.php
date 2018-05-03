@@ -47,7 +47,7 @@ class Export
             'size' => 50,
         ];
 
-        $docs = $this->elasticsearchClient->search($params);
+        $docs = json_decode($this->elasticsearchClient->search($params), true);
         $scrollId = $docs['_scroll_id'];
 
         while (\true) {
@@ -73,10 +73,10 @@ class Export
                 break;
             }
 
-            $docs = $this->elasticsearchClient->scroll([
+            $docs = json_decode($this->elasticsearchClient->scroll([
                 'scroll_id' => $scrollId,
                 'scroll' => '30s',
-            ]);
+            ]), true);
 
             if (isset($docs['_scroll_id'])) {
                 $scrollId = $docs['_scroll_id'];
