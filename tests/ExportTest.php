@@ -254,7 +254,7 @@ namespace go1\report_helpers\tests\export {
 
         public function testGetValues()
         {
-            $fields = ['field_key_1', 'field_key_2', 'field_key_3'];
+            $fields = ['field_key_1', 'field_key_2', 'field_key_3', 'field_invalid'];
             $hit = ['_source' => ['field_key_1' => '123', 'field_key_2' => 'abc', 'field_key_3' => 'abc123', 'abc' => ['123' => 123]]];
             $formatters = [
                 'field_key_1' => function ($hit) {
@@ -265,7 +265,7 @@ namespace go1\report_helpers\tests\export {
             $method = (new ReflectionObject($this->helper))->getMethod('getValues');
             $method->setAccessible(true);
             $values = $method->invoke($this->helper, $fields, $hit, $formatters);
-            $this->assertEquals(['123 rendered', 123, 'abc123'], $values);
+            $this->assertEquals(['123 rendered', 123, 'abc123', ''], $values);
         }
     }
 
