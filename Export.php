@@ -103,8 +103,11 @@ class Export
                 if (isset($formatters[$key]) && is_string($formatters[$key])) {
                     $value = array_get($hit['_source'], $formatters[$key]);
                 }
-                else {
+                elseif (isset($hit['_source'][$key])) {
                     $value = $hit['_source'][$key];
+                }
+                else {
+                    $value = '';
                 }
                 if (is_array($value)) {
                     $value = implode(', ', $value);
