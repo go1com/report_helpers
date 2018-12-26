@@ -88,10 +88,6 @@ namespace go1\report_helpers\tests\export {
 
         public function testDoExportAllSelected()
         {
-            $portal = 'portal object';
-            $payload = 'jwt payload';
-            $lo = 'lo object';
-
             $params = [
                 'body' => [
                     'query' => [
@@ -120,7 +116,7 @@ namespace go1\report_helpers\tests\export {
                     'scroll' => '30s',
                     'size' => 50,
                 ])
-                ->will($this->returnValue(json_encode([
+                ->will($this->returnValue([
                     '_scroll_id' => 1234567,
                     'hits' => [
                         'hits' => [
@@ -130,7 +126,7 @@ namespace go1\report_helpers\tests\export {
                             ['_id' => 456, '_source' => ['id' => 456]],
                         ]
                     ]
-                ])));
+                ]));
             $this->elasticsearchClient
                 ->expects($this->once())
                 ->method('scroll')
@@ -138,12 +134,12 @@ namespace go1\report_helpers\tests\export {
                     'scroll_id' => 1234567,
                     'scroll' => '30s',
                 ])
-                ->will($this->returnValue(json_encode([
+                ->will($this->returnValue([
                     '_scroll_id' => 1234568,
                     'hits' => [
                         'hits' => []
                     ]
-                ])));
+                ]));
             $this->elasticsearchClient
                 ->expects($this->once())
                 ->method('clearScroll')
@@ -159,10 +155,6 @@ namespace go1\report_helpers\tests\export {
 
         public function testDoExportNotAllSelected()
         {
-            $portal = 'portal object';
-            $payload = 'jwt payload';
-            $lo = 'lo object';
-
             $params = [
                 'body' => [
                     'query' => [
@@ -211,7 +203,7 @@ namespace go1\report_helpers\tests\export {
                     'scroll' => '30s',
                     'size' => 50,
                 ])
-                ->will($this->returnValue(json_encode([
+                ->will($this->returnValue([
                     '_scroll_id' => 1234567,
                     'hits' => [
                         'hits' => [
@@ -219,7 +211,7 @@ namespace go1\report_helpers\tests\export {
                             ['_id' => 234, '_source' => ['id' => 234]],
                         ]
                     ]
-                ])));
+                ]));
             $this->elasticsearchClient
                 ->expects($this->once())
                 ->method('scroll')
@@ -227,12 +219,12 @@ namespace go1\report_helpers\tests\export {
                     'scroll_id' => 1234567,
                     'scroll' => '30s',
                 ])
-                ->will($this->returnValue(json_encode([
+                ->will($this->returnValue([
                     '_scroll_id' => 1234568,
                     'hits' => [
                         'hits' => []
                     ]
-                ])));
+                ]));
             $this->elasticsearchClient
                 ->expects($this->once())
                 ->method('clearScroll')

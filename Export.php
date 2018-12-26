@@ -47,7 +47,8 @@ class Export
             'size' => 50,
         ];
 
-        $docs = json_decode($this->elasticsearchClient->search($params), true);
+
+        $docs = $this->elasticsearchClient->search($params);
         $scrollId = $docs['_scroll_id'];
 
         while (\true) {
@@ -63,9 +64,7 @@ class Export
             else {
                 if (isset($scrollId)) {
                     try {
-                        $this->elasticsearchClient->clearScroll([
-                                'scroll_id' => $scrollId,
-                        ]);
+                        $this->elasticsearchClient->clearScroll(['scroll_id' => $scrollId]);
                     }
                     catch (Missing404Exception $e) {
                     }
@@ -73,10 +72,10 @@ class Export
                 break;
             }
 
-            $docs = json_decode($this->elasticsearchClient->scroll([
+            $docs = $this->elasticsearchClient->scroll([
                 'scroll_id' => $scrollId,
-                'scroll' => '30s',
-            ]), true);
+                'scroll'    => '30s'
+            ]);
 
             if (isset($docs['_scroll_id'])) {
                 $scrollId = $docs['_scroll_id'];
