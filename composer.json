@@ -11,6 +11,8 @@
   "require": {
     "elasticsearch/elasticsearch": "^5.0",
     "rappasoft/laravel-helpers": "dev-master",
-    "go1/util": "dev-master"
+    "go1/util": "dev-master",
+    "mrubiosan/flysystem-url": "dev-master",
+    "league/flysystem-aws-s3-v3": "^1.0"
   }
 }
