@@ -16,7 +16,7 @@ class ExportTest extends TestCase
 
     private $testSubject;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $this->s3ClientMock = $this->prophesize(S3Client::class);
         $this->esClientMock = $this->prophesize(Client::class);

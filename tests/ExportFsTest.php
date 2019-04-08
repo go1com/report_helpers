@@ -14,7 +14,7 @@ class ExportFsTest extends TestCase
 
     private $testSubject;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $this->fsMock = $this->prophesize(UrlFilesystemInterface::class);
         $this->exportCsvMock = $this->prophesize(ExportCsv::class);

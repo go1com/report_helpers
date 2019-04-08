@@ -12,7 +12,7 @@ class ExportCsvTest extends TestCase
     private $results;
     private $formatters;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $this->fields = ['field_id', 'field_key_1', 'field_key_2', 'field_key_3'];
         $this->headers = ['ID', 'Field 1', 'Field 2', 'Field 3'];
