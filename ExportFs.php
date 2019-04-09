@@ -26,7 +26,9 @@ class ExportFs
     {
         $stream = $this->exportCsv->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters);
         $this->fileSystem->writeStream($key, $stream, ['visibility' => AdapterInterface::VISIBILITY_PUBLIC]);
-        fclose($stream);
+        if (is_resource($stream)) { //Some adapters already close the stream
+            @fclose($stream);
+        }
     }
 
     public function getFile($key)
