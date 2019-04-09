@@ -1,15 +1,14 @@
 <?php
 namespace go1\report_helpers\tests;
 
-use Aws\S3\S3Client;
-use go1\report_helpers\Export;
 use go1\report_helpers\ExportCsv;
+use go1\report_helpers\ExportFs;
+use Mrubiosan\FlyUrl\Filesystem\UrlFilesystemInterface;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 
-class ExportTest extends TestCase
+class ExportFsTest extends TestCase
 {
-    private $s3ClientMock;
+    private $fsMock;
 
     private $exportCsvMock;
 
@@ -17,10 +16,10 @@ class ExportTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->s3ClientMock = $this->prophesize(S3Client::class);
+        $this->fsMock = $this->prophesize(UrlFilesystemInterface::class);
         $this->exportCsvMock = $this->prophesize(ExportCsv::class);
-        $this->testSubject = new Export(
-            $this->s3ClientMock->reveal(),
+        $this->testSubject = new ExportFs(
+            $this->fsMock->reveal(),
             $this->exportCsvMock->reveal()
         );
     }
@@ -40,16 +39,15 @@ class ExportTest extends TestCase
             ->shouldBeCalled()
             ->willReturn($stream);
 
-        $this->s3ClientMock->upload('bucket', 'key', $stream, 'public-read', Argument::cetera())
+        $this->fsMock->writeStream('key', $stream, ['visibility' => 'public'])
             ->shouldBeCalled();
 
-        $this->testSubject->doExport('bucket', 'key', $fields, $headers, $params, $selectedIds, $excludedIds,
-            $allSelected, $formatters);
+        $this->testSubject->doExport('key', $fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters);
     }
 
     public function testGetFile()
     {
-        $result = $this->testSubject->getFile('region', 'bucket', 'key');
-        $this->assertEquals("https://s3-region.amazonaws.com/bucket/key", $result);
+        $this->fsMock->getUrl('foo')->shouldBeCalled();
+        $this->testSubject->getFile('foo');
     }
 }
