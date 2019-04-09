@@ -2,7 +2,6 @@
 namespace go1\report_helpers;
 
 use Aws\S3\S3Client;
-use Elasticsearch\Client as ElasticsearchClient;
 use Mrubiosan\FlyUrl\Adapter\UrlAwsS3Adapter;
 use Mrubiosan\FlyUrl\Filesystem\UrlFilesystem;
 
@@ -22,44 +21,38 @@ class Export
      */
     private $exportCsv;
 
-    /**
-     * @var ElasticsearchClient
-     */
-    private $elasticsearchClient;
-
-    public function __construct(S3Client $s3Client, ElasticsearchClient $elasticsearchClient)
+    public function __construct(S3Client $s3Client, ExportCsv $exportCsv)
     {
         $this->s3Client = $s3Client;
-        $this->elasticsearchClient = $elasticsearchClient;
-    }
-
-    /**
-     *
-     * @param ExportCsv $exportCsv
-     */
-    public function setExportCsv(ExportCsv $exportCsv)
-    {
         $this->exportCsv = $exportCsv;
     }
 
-    protected function getExportCsv() : ExportCsv
-    {
-        if (!$this->exportCsv) {
-            $this->exportCsv = new ExportCsv($this->elasticsearchClient);
-        }
-
-        return $this->exportCsv;
-    }
-
+    /**
+     * @param string $bucket
+     * @param string $key
+     * @param array  $fields
+     * @param array  $headers
+     * @param array  $params
+     * @param array  $selectedIds
+     * @param array  $excludedIds
+     * @param bool   $allSelected
+     * @param array  $formatters
+     */
     public function doExport($bucket, $key, $fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters = [])
     {
         $fs = new UrlFilesystem(new UrlAwsS3Adapter($this->s3Client, $bucket), [
             'disable_asserts' => true
         ]);
-        $exportFs = new ExportFs($fs, $this->getExportCsv());
+        $exportFs = new ExportFs($fs, $this->exportCsv);
         $exportFs->doExport($key, $fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters);
     }
 
+    /**
+     * @param string $region
+     * @param string $bucket
+     * @param string $key
+     * @return string
+     */
     public function getFile($region, $bucket, $key)
     {
         $domain = getenv('MONOLITH') ? getenv('AWS_S3_ENDPOINT') : "https://s3-{$region}.amazonaws.com";

@@ -2,7 +2,6 @@
 namespace go1\report_helpers\tests;
 
 use Aws\S3\S3Client;
-use Elasticsearch\Client;
 use go1\report_helpers\Export;
 use go1\report_helpers\ExportCsv;
 use PHPUnit\Framework\TestCase;
@@ -12,17 +11,17 @@ class ExportTest extends TestCase
 {
     private $s3ClientMock;
 
-    private $esClientMock;
+    private $exportCsvMock;
 
     private $testSubject;
 
     protected function setUp() : void
     {
         $this->s3ClientMock = $this->prophesize(S3Client::class);
-        $this->esClientMock = $this->prophesize(Client::class);
+        $this->exportCsvMock = $this->prophesize(ExportCsv::class);
         $this->testSubject = new Export(
             $this->s3ClientMock->reveal(),
-            $this->esClientMock->reveal()
+            $this->exportCsvMock->reveal()
         );
     }
 
@@ -36,11 +35,8 @@ class ExportTest extends TestCase
         $allSelected = true;
         $formatters = ['foo' => 'bar'];
 
-        $exportCsvMock = $this->prophesize(ExportCsv::class);
-        $this->testSubject->setExportCsv($exportCsvMock->reveal());
-
         $stream = fopen('php://memory', 'w+');
-        $exportCsvMock->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters)
+        $this->exportCsvMock->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters)
             ->shouldBeCalled()
             ->willReturn($stream);
 

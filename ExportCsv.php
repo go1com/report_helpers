@@ -14,6 +14,17 @@ class ExportCsv
         $this->elasticsearchClient = $elasticsearchClient;
     }
 
+    /**
+     * @param array  $fields
+     * @param array  $headers
+     * @param array  $params
+     * @param array  $selectedIds
+     * @param array  $excludedIds
+     * @param bool   $allSelected
+     * @param array  $formatters
+     * @return resource
+     * @throws \RuntimeException
+     */
     public function export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters = [])
     {
         $stream = fopen('php://temp', 'w+b');
