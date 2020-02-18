@@ -3,6 +3,7 @@ namespace go1\report_helpers\tests;
 
 use Elasticsearch\Client;
 use go1\report_helpers\ExportCsv;
+use go1\report_helpers\PreprocessorInterface;
 use PHPUnit\Framework\TestCase;
 
 class ExportCsvTest extends TestCase
@@ -260,6 +261,53 @@ class ExportCsvTest extends TestCase
             $resource = $testSubject->export($this->fields, $this->headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters);
             $this->assertTrue(is_resource($resource), 'Is resource');
             $this->assertEquals("ID,\"Field 1\",\"Field 2\",\"Field 3\"\n345,\"3 rendered\",345,5\n456,\"4 rendered\",456,6\n", fread($resource, 4096));
+        } finally {
+            if (!empty($resource) && is_resource($resource)) {
+                fclose($resource);
+            }
+        }
+    }
+
+    public function testPreprocess()
+    {
+        $esMock = $this->prophesize(Client::class);
+        $preprocessMock = $this->prophesize(PreprocessorInterface::class);
+
+        $testSubject = new ExportCsv($esMock->reveal(), $preprocessMock->reveal());
+        $params = [];
+        $selectedIds = [];
+        $excludedIds = [123, 234];
+        $allSelected = true;
+
+        $esMock->search($params + ['scroll' => '30s', 'size'   => 50])
+            ->shouldBeCalled()
+            ->willReturn($results = [
+                '_scroll_id' => 1234567,
+                'hits'       => [
+                    'hits' => [
+                        ['_id' => 123, '_source' => ['id' => 123]],
+                    ],
+                ],
+            ])
+        ;
+
+        $esMock->scroll(['scroll_id' => 1234567, 'scroll' => '30s'])
+            ->shouldBeCalled()
+            ->willReturn([
+                '_scroll_id' => 1234568,
+                'hits'       => [
+                    'hits' => [],
+                ],
+            ])
+        ;
+
+        $esMock->clearScroll(['scroll_id' => 1234568])->shouldBeCalled();
+
+        try {
+            $resource = $testSubject->export($this->fields, $this->headers, $params, $selectedIds, $excludedIds, $allSelected, []);
+            $preprocessMock->process($results)->shouldBeCalled();
+
+            $this->assertTrue(is_resource($resource), 'Is resource');
         } finally {
             if (!empty($resource) && is_resource($resource)) {
                 fclose($resource);

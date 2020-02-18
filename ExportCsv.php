@@ -8,10 +8,12 @@ class ExportCsv
 {
     /** @var ElasticsearchClient */
     protected $elasticsearchClient;
+    protected $preprocessor;
 
-    public function __construct(ElasticsearchClient $elasticsearchClient)
+    public function __construct(ElasticsearchClient $elasticsearchClient, ?PreprocessorInterface $preprocessor = null)
     {
         $this->elasticsearchClient = $elasticsearchClient;
+        $this->preprocessor = $preprocessor;
     }
 
     /**
@@ -54,6 +56,10 @@ class ExportCsv
         $scrollId = $docs['_scroll_id'];
 
         while (true) {
+            if ($this->preprocessor) {
+                $this->preprocessor->process($docs);
+            }
+
             if (count($docs['hits']['hits']) > 0) {
                 foreach ($docs['hits']['hits'] as $hit) {
                     if (empty($excludedIds) || !in_array($hit['_id'], $excludedIds)) {
