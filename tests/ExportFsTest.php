@@ -33,16 +33,17 @@ class ExportFsTest extends TestCase
         $excludedIds = [2];
         $allSelected = true;
         $formatters = ['foo' => 'bar'];
+        $settings = [];
 
         $stream = fopen('php://memory', 'w+');
-        $this->exportCsvMock->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters)
+        $this->exportCsvMock->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters, $settings)
             ->shouldBeCalled()
             ->willReturn($stream);
 
         $this->fsMock->writeStream('key', $stream, ['visibility' => 'public'])
             ->shouldBeCalled();
 
-        $this->testSubject->doExport('key', $fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters);
+        $this->testSubject->doExport('key', $fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters, $settings);
     }
 
     public function testGetFile()

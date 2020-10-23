@@ -17,17 +17,26 @@ class ExportCsv
     }
 
     /**
-     * @param array  $fields
-     * @param array  $headers
-     * @param array  $params
-     * @param array  $selectedIds
-     * @param array  $excludedIds
-     * @param bool   $allSelected
-     * @param array  $formatters
+     * @param array $fields
+     * @param array $headers
+     * @param array $params
+     * @param array $selectedIds
+     * @param array $excludedIds
+     * @param bool $allSelected
+     * @param array $formatters
+     * @param array $customValuesSettings
      * @return resource
      * @throws \RuntimeException
      */
-    public function export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters = [])
+    public function export(
+        $fields,
+        $headers,
+        $params,
+        $selectedIds,
+        $excludedIds,
+        $allSelected,
+        $formatters = [],
+        $customValuesSettings = [])
     {
         $stream = fopen('php://temp', 'w+b');
         if ($stream === false) {
@@ -63,7 +72,7 @@ class ExportCsv
             if (count($docs['hits']['hits']) > 0) {
                 foreach ($docs['hits']['hits'] as $hit) {
                     if (empty($excludedIds) || !in_array($hit['_id'], $excludedIds)) {
-                        $csv = $this->getValues($fields, $hit, $formatters);
+                        $csv = $this->getValues($fields, $hit, $formatters, $customValuesSettings);
                         // Write row.
                         fputcsv($stream, $csv);
                     }
@@ -94,12 +103,17 @@ class ExportCsv
         return $stream;
     }
 
-    protected function getValues($fields, $hit, $formatters = [])
+    protected function getValues($fields, $hit, $formatters = [], $customValuesSettings = [])
     {
         $values = [];
+        $customValues = $this->parseCustomValuesSettings($customValuesSettings);
         foreach ($fields as $key) {
             if (isset($formatters[$key]) && is_callable($formatters[$key])) {
-                $values[] = $formatters[$key]($hit);
+                if (isset($customValues[$key])) {
+                    $values[] = $formatters[$key]($hit, $customValues[$key]);
+                } else {
+                    $values[] = $formatters[$key]($hit);
+                }
             }
             else {
                 if (isset($formatters[$key]) && is_string($formatters[$key])) {
@@ -118,5 +132,19 @@ class ExportCsv
             }
         }
         return $values;
+    }
+
+    public function parseCustomValuesSettings($customValuesSettings = [])
+    {
+        $results = [];
+        if (!empty($customValuesSettings)) {
+            foreach ($customValuesSettings as $customValuesSetting) {
+                foreach ($customValuesSetting['fields'] as $field) {
+                    $parsedSettings[$field] = $customValuesSetting['rules'];
+                }
+            }
+        }
+
+        return $results;
     }
 }

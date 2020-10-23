@@ -18,7 +18,7 @@ class ReportHelpersTest extends TestCase
                     's3Options'    => [
                         'key' => 'testing key',
                         'secret' => 'testing secret',
-                        'region' => 'testing region',
+                        'region' => 'AU',
                         'bucket' => 'test bucket',
                         'version' => 'latest',
                         'endpoint' => 'test endpoint',
