@@ -140,7 +140,7 @@ class ExportCsv
         if (!empty($customValuesSettings)) {
             foreach ($customValuesSettings as $customValuesSetting) {
                 foreach ($customValuesSetting['fields'] as $field) {
-                    $parsedSettings[$field] = $customValuesSetting['rules'];
+                    $results[$field] = $customValuesSetting['rules'];
                 }
             }
         }
