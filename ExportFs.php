@@ -24,18 +24,19 @@ class ExportFs
 
     /**
      * @param string $key
-     * @param array  $fields
-     * @param array  $headers
-     * @param array  $params
-     * @param array  $selectedIds
-     * @param array  $excludedIds
-     * @param bool   $allSelected
-     * @param array  $formatters
+     * @param array $fields
+     * @param array $headers
+     * @param array $params
+     * @param array $selectedIds
+     * @param array $excludedIds
+     * @param bool $allSelected
+     * @param array $formatters
+     * @param array $customValuesSettings
      * @throws \RuntimeException
      */
-    public function doExport($key, $fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters = [])
+    public function doExport($key, $fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters = [], $customValuesSettings = [])
     {
-        $stream = $this->exportCsv->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters);
+        $stream = $this->exportCsv->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters, $customValuesSettings);
         $this->fileSystem->writeStream($key, $stream, ['visibility' => AdapterInterface::VISIBILITY_PUBLIC]);
         if (is_resource($stream)) { //Some adapters already close the stream
             @fclose($stream);

@@ -34,9 +34,10 @@ class ExportTest extends TestCase
         $excludedIds = [2];
         $allSelected = true;
         $formatters = ['foo' => 'bar'];
+        $customValuesSettings = [];
 
         $stream = fopen('php://memory', 'w+');
-        $this->exportCsvMock->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters)
+        $this->exportCsvMock->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters, $customValuesSettings)
             ->shouldBeCalled()
             ->willReturn($stream);
 
