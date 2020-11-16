@@ -57,7 +57,7 @@ class ExportCsv
 
         $params += [
             'scroll' => '30s',
-            'size' => 50,
+            'size' => 500,
         ];
 
 
