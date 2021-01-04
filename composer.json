@@ -13,7 +13,9 @@
     "rappasoft/laravel-helpers": "dev-master",
     "go1/util": "dev-master",
     "mrubiosan/flysystem-url": "^1.0",
-    "league/flysystem-aws-s3-v3": "^1.0",
+    "league/flysystem-aws-s3-v3": "^1.0"
+  },
+  "require-dev":       {
     "phpunit/phpunit": "^9.4"
   },
   "repositories": [
