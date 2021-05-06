@@ -33,7 +33,7 @@ class ExportFs
         bool $allSelected,
         array $formatters = [],
         array $customValuesSettings = [],
-        callable $preprocess = null,
+        callable $preprocess = null
     ) {
         $stream = $this->exportCsv->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters, $customValuesSettings, $preprocess);
         $this->fileSystem->writeStream($key, $stream, ['visibility' => AdapterInterface::VISIBILITY_PUBLIC]);
