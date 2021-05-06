@@ -30,7 +30,7 @@ class ExportCsv
         bool $allSelected,
         array $formatters = [],
         array $customValuesSettings = [],
-        callable $preprocess = null,
+        callable $preprocess = null
     ) {
         $stream = fopen('php://temp', 'w+b');
         if ($stream === false) {
