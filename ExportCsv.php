@@ -50,16 +50,14 @@ class ExportCsv
         }
 
         $params += ['scroll' => '30s', 'size' => 50];
-
         $docs = $this->elasticsearchClient->search($params);
-
-        if (!is_null($preprocess)) {
-            $preprocess($docs);
-        }
-
         $scrollId = $docs['_scroll_id'];
 
         while (true) {
+            if (!is_null($preprocess)) {
+                $preprocess($docs);
+            }
+
             if ($this->preprocessor) {
                 $this->preprocessor->process($docs);
             }
