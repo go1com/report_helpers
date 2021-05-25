@@ -1,4 +1,5 @@
 <?php
+
 namespace go1\report_helpers;
 
 use League\Flysystem\AdapterInterface;
@@ -22,21 +23,19 @@ class ExportFs
         $this->exportCsv = $exportCsv;
     }
 
-    /**
-     * @param string $key
-     * @param array $fields
-     * @param array $headers
-     * @param array $params
-     * @param array $selectedIds
-     * @param array $excludedIds
-     * @param bool $allSelected
-     * @param array $formatters
-     * @param array $customValuesSettings
-     * @throws \RuntimeException
-     */
-    public function doExport($key, $fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters = [], $customValuesSettings = [])
-    {
-        $stream = $this->exportCsv->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters, $customValuesSettings);
+    public function doExport(
+        string $key,
+        array $fields,
+        array $headers,
+        array $params,
+        array $selectedIds,
+        array $excludedIds,
+        bool $allSelected,
+        array $formatters = [],
+        array $customValuesSettings = [],
+        callable $preprocess = null
+    ) {
+        $stream = $this->exportCsv->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters, $customValuesSettings, $preprocess);
         $this->fileSystem->writeStream($key, $stream, ['visibility' => AdapterInterface::VISIBILITY_PUBLIC]);
         if (is_resource($stream)) { //Some adapters already close the stream
             @fclose($stream);
@@ -45,6 +44,7 @@ class ExportFs
 
     /**
      * Returns the file URL
+     *
      * @param string $key
      * @return string
      */
