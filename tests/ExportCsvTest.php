@@ -5,6 +5,8 @@ use Elasticsearch\Client;
 use go1\report_helpers\ExportCsv;
 use go1\report_helpers\PreprocessorInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophet;
+use ReflectionClass;
 
 class ExportCsvTest extends TestCase
 {
@@ -12,9 +14,11 @@ class ExportCsvTest extends TestCase
     private $headers;
     private $results;
     private $formatters;
+    private Prophet $prophet;
 
     protected function setUp() : void
     {
+        $this->prophet = new Prophet();
         $this->fields = ['field_id', 'field_key_1', 'field_key_2', 'field_key_3'];
         $this->headers = ['ID', 'Field 1', 'Field 2', 'Field 3'];
         $this->results = [
@@ -39,9 +43,14 @@ class ExportCsvTest extends TestCase
         ];
     }
 
+    protected function tearDown(): void
+    {
+        $this->prophet->checkPredictions();
+    }
+
     public function testExportAllSelected()
     {
-        $esMock = $this->prophesize(Client::class);
+        $esMock = $this->prophet->prophesize(Client::class);
         $testSubject = new ExportCsv($esMock->reveal());
         $params = [
             'body' => [
@@ -110,7 +119,7 @@ class ExportCsvTest extends TestCase
 
     public function testExportNotAllSelected()
     {
-        $esMock = $this->prophesize(Client::class);
+        $esMock = $this->prophet->prophesize(Client::class);
         $testSubject = new ExportCsv($esMock->reveal());
         $params = [
             'body' => [
@@ -196,7 +205,7 @@ class ExportCsvTest extends TestCase
 
     public function testFormatters()
     {
-        $esMock = $this->prophesize(Client::class);
+        $esMock = $this->prophet->prophesize(Client::class);
         $testSubject = new ExportCsv($esMock->reveal());
         $params = [
             'body' => [
@@ -270,8 +279,8 @@ class ExportCsvTest extends TestCase
 
     public function testPreprocess()
     {
-        $esMock = $this->prophesize(Client::class);
-        $preprocessMock = $this->prophesize(PreprocessorInterface::class);
+        $esMock = $this->prophet->prophesize(Client::class);
+        $preprocessMock = $this->prophet->prophesize(PreprocessorInterface::class);
 
         $testSubject = new ExportCsv($esMock->reveal(), $preprocessMock->reveal());
         $params = [];
@@ -313,5 +322,23 @@ class ExportCsvTest extends TestCase
                 fclose($resource);
             }
         }
+    }
+
+    public function testSetElasticSearchBatchSize()
+    {
+        $newBatchSize = 5000;
+        $esMock = $this->prophet->prophesize(Client::class);
+        $exportCSV = new ExportCsv($esMock->reveal());
+        $exportCSV->setElasticSearchBatchSize($newBatchSize);
+        $batchSize = $this->accessProtected($exportCSV,'elasticSearchBatchSize');
+        $this->assertEquals($newBatchSize, $batchSize);
+    }
+
+    protected function accessProtected($obj, $prop)
+    {
+        $reflection = new ReflectionClass($obj);
+        $property = $reflection->getProperty($prop);
+        $property->setAccessible(true);
+        return $property->getValue($obj);
     }
 }

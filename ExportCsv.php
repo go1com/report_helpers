@@ -11,11 +11,17 @@ class ExportCsv
     /** @var ElasticsearchClient */
     protected $elasticsearchClient;
     protected $preprocessor;
+    protected $elasticSearchBatchSize = 50;
 
     public function __construct(ElasticsearchClient $elasticsearchClient, ?PreprocessorInterface $preprocessor = null)
     {
         $this->elasticsearchClient = $elasticsearchClient;
         $this->preprocessor = $preprocessor;
+    }
+
+    public function setElasticSearchBatchSize(int $size)
+    {
+        $this->elasticSearchBatchSize = $size;
     }
 
     /**
@@ -49,7 +55,7 @@ class ExportCsv
             ];
         }
 
-        $params += ['scroll' => '30s', 'size' => 50];
+        $params += ['scroll' => '30s', 'size' => $this->elasticSearchBatchSize];
         $docs = $this->elasticsearchClient->search($params);
         $scrollId = $docs['_scroll_id'];
 

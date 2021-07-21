@@ -16,7 +16,9 @@
     "league/flysystem-aws-s3-v3": "^1.0"
   },
   "require-dev":       {
-    "phpunit/phpunit": "^9.4"
+    "phpunit/phpunit": "^9.4",
+    "phpspec/prophecy-phpunit": "^2.0",
+    "mockery/mockery": "^1.4"
   },
   "repositories": [
     { "type": "vcs", "url": "git@code.go1.com.au:mirror/go1-core/util.git" }
