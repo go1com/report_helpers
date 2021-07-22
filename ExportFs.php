@@ -52,4 +52,9 @@ class ExportFs
     {
         return $this->fileSystem->getUrl($key);
     }
+
+    public function getExportCSV(): ExportCsv
+    {
+        return $this->exportCsv;
+    }
 }
