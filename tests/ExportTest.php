@@ -4,8 +4,11 @@ namespace go1\report_helpers\tests;
 use Aws\S3\S3Client;
 use go1\report_helpers\Export;
 use go1\report_helpers\ExportCsv;
+use go1\report_helpers\ExportFs;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophet;
 
 class ExportTest extends TestCase
 {
@@ -15,13 +18,31 @@ class ExportTest extends TestCase
 
     private $testSubject;
 
+    private Prophet $prophet;
+
     protected function setUp() : void
     {
-        $this->s3ClientMock = $this->prophesize(S3Client::class);
-        $this->exportCsvMock = $this->prophesize(ExportCsv::class);
+        $this->prophet = new Prophet();
+        $this->s3ClientMock = $this->prophet->prophesize(S3Client::class);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->prophet->checkPredictions();
+    }
+
+    protected function setUpTestSubject($stream)
+    {
+        $this->exportCsvMock = Mockery::mock(ExportCSV::class);
+        $this->exportCsvMock
+            ->shouldReceive('export')
+            ->andReturn($stream)
+            ->atLeast()
+            ->times(1);
+
         $this->testSubject = new Export(
             $this->s3ClientMock->reveal(),
-            $this->exportCsvMock->reveal()
+            $this->exportCsvMock
         );
     }
 
@@ -37,9 +58,7 @@ class ExportTest extends TestCase
         $customValuesSettings = [];
 
         $stream = fopen('php://memory', 'w+');
-        $this->exportCsvMock->export($fields, $headers, $params, $selectedIds, $excludedIds, $allSelected, $formatters, $customValuesSettings)
-            ->shouldBeCalled()
-            ->willReturn($stream);
+        $this->setUpTestSubject($stream);
 
         $this->s3ClientMock->upload('bucket', 'key', $stream, 'public-read', Argument::cetera())
             ->shouldBeCalled();
@@ -50,6 +69,9 @@ class ExportTest extends TestCase
 
     public function testGetFile()
     {
+        $stream = fopen('php://memory', 'w+');
+        $this->setUpTestSubject($stream);
+
         $result = $this->testSubject->getFile('region', 'bucket', 'key');
         $this->assertEquals("https://s3-region.amazonaws.com/bucket/key", $result);
     }
