@@ -10,13 +10,15 @@ class ExportCsv
 {
     /** @var ElasticsearchClient */
     protected $elasticsearchClient;
-    protected $preprocessor;
     protected $elasticSearchBatchSize = 50;
+    protected ?PostProcessorInterface $postProcessor;
+    protected ?PreprocessorInterface $preprocessor;
 
-    public function __construct(ElasticsearchClient $elasticsearchClient, ?PreprocessorInterface $preprocessor = null)
+    public function __construct(ElasticsearchClient $elasticsearchClient, ?PreprocessorInterface $preprocessor = null, ?PostProcessorInterface $postProcessor = null)
     {
         $this->elasticsearchClient = $elasticsearchClient;
         $this->preprocessor = $preprocessor;
+        $this->postProcessor = $postProcessor;
     }
 
     public function setElasticSearchBatchSize(int $size)
@@ -57,7 +59,12 @@ class ExportCsv
 
         $params += ['scroll' => '30s', 'size' => $this->elasticSearchBatchSize];
         $docs = $this->elasticsearchClient->search($params);
-        $scrollId = $docs['_scroll_id'];
+        $scrollId = $docs['_scroll_id'] ?? null;
+
+        if ($this->preprocessor && $this->postProcessor) {
+            $this->postProcessor->setQuery($params)->checkQueryForStatusFilter();
+            $this->preprocessor->setPostProcessor($this->postProcessor);
+        }
 
         while (true) {
             if (!is_null($preprocess)) {
