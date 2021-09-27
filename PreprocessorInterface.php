@@ -7,7 +7,7 @@ interface PreprocessorInterface
    /**
     * For post processing tasks like filtering
     **/
-    public function setEnrolmentPostProcessor(PostProcessorInterface $e);
+    public function setPostProcessor(PostProcessorInterface $e);
 
 
     /**
