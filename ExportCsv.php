@@ -75,7 +75,7 @@ class ExportCsv
                 $this->preprocessor->process($docs);
             }
 
-            if (is_array($docs['hits']['hits']) && count($docs['hits']['hits']) > 0) {
+            if (isset($docs['hits']['hits']) && count($docs['hits']['hits']) > 0) {
                 foreach ($docs['hits']['hits'] as $hit) {
                     if (empty($excludedIds) || !in_array($hit['_id'], $excludedIds)) {
                         $csv = $this->getValues($fields, $hit, $formatters, $customValuesSettings);
