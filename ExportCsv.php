@@ -59,6 +59,7 @@ class ExportCsv
 
         $params += ['scroll' => '30s', 'size' => $this->elasticSearchBatchSize];
         $docs = $this->elasticsearchClient->search($params);
+        $docs = is_scalar($docs) ? json_decode($docs, true) : $docs;
         $scrollId = $docs['_scroll_id'] ?? null;
 
         if ($this->preprocessor && $this->postProcessor) {
