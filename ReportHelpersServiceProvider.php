@@ -10,7 +10,7 @@ class ReportHelpersServiceProvider implements ServiceProviderInterface
     public function register(Container $c)
     {
         $c['report_export'] = function (Container $c) {
-            return new Export($c['go1.client.s3'], new ExportCsv($c['go1.client.es']));
+            return new Export($c['go1.client.s3'], new ExportCsv($c['go1.client.es.compat']));
         };
     }
 }
