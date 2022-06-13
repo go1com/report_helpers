@@ -2,7 +2,7 @@
 
 namespace go1\report_helpers;
 
-use Elasticsearch\Client as ElasticsearchClient;
+use go1\ElasticsearchCompat\SearchClient as ElasticsearchClient;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use function is_null;
 

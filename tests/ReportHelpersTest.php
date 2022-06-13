@@ -30,6 +30,13 @@ class ReportHelpersTest extends TestCase
                         'region' => 'testing region',
                         'endpoint' => 'http://es:9200',
                     ],
+                    'esOptions.v8' => [
+                        'credential' => true,
+                        'key' => 'testing key',
+                        'secret' => 'testing secret',
+                        'region' => 'testing region',
+                        'endpoint' => 'http://es:9200',
+                    ]
                 ]);
         $c->register(new ReportHelpersServiceProvider);
 

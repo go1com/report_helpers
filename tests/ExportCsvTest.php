@@ -1,7 +1,7 @@
 <?php
 namespace go1\report_helpers\tests;
 
-use Elasticsearch\Client;
+use go1\ElasticsearchCompat\SearchClient;
 use go1\report_helpers\ExportCsv;
 use go1\report_helpers\PreprocessorInterface;
 use PHPUnit\Framework\TestCase;
@@ -50,7 +50,7 @@ class ExportCsvTest extends TestCase
 
     public function testExportAllSelected()
     {
-        $esMock = $this->prophet->prophesize(Client::class);
+        $esMock = $this->prophet->prophesize(SearchClient::class);
         $testSubject = new ExportCsv($esMock->reveal());
         $params = [
             'body' => [
@@ -119,7 +119,7 @@ class ExportCsvTest extends TestCase
 
     public function testExportNotAllSelected()
     {
-        $esMock = $this->prophet->prophesize(Client::class);
+        $esMock = $this->prophet->prophesize(SearchClient::class);
         $testSubject = new ExportCsv($esMock->reveal());
         $params = [
             'body' => [
@@ -205,7 +205,7 @@ class ExportCsvTest extends TestCase
 
     public function testFormatters()
     {
-        $esMock = $this->prophet->prophesize(Client::class);
+        $esMock = $this->prophet->prophesize(SearchClient::class);
         $testSubject = new ExportCsv($esMock->reveal());
         $params = [
             'body' => [
@@ -279,7 +279,7 @@ class ExportCsvTest extends TestCase
 
     public function testPreprocess()
     {
-        $esMock = $this->prophet->prophesize(Client::class);
+        $esMock = $this->prophet->prophesize(SearchClient::class);
         $preprocessMock = $this->prophet->prophesize(PreprocessorInterface::class);
 
         $testSubject = new ExportCsv($esMock->reveal(), $preprocessMock->reveal());
@@ -327,7 +327,7 @@ class ExportCsvTest extends TestCase
     public function testSetElasticSearchBatchSize()
     {
         $newBatchSize = 5000;
-        $esMock = $this->prophet->prophesize(Client::class);
+        $esMock = $this->prophet->prophesize(SearchClient::class);
         $exportCSV = new ExportCsv($esMock->reveal());
         $exportCSV->setElasticSearchBatchSize($newBatchSize);
         $batchSize = $this->accessProtected($exportCSV,'elasticSearchBatchSize');
