@@ -794,7 +794,7 @@
             "source": {
                 "type": "git",
                 "url": "git@code.go1.com.au:util/es.git",
-                "reference": "db243688a970b689fd8035e620c04ce43bb8e681"
+                "reference": "e0d9c031d8c5f953bb9ef038aba6b519b951595f"
             },
             "require": {
                 "elasticsearch/elasticsearch": "^5.0"
@@ -837,7 +837,7 @@
                 "go1",
                 "package"
             ],
-            "time": "2022-06-13T01:27:46+00:00"
+            "time": "2022-06-13T06:32:31+00:00"
         },
         {
             "name": "go1/flood",
@@ -2063,16 +2063,16 @@
         },
         {
             "name": "paragonie/constant_time_encoding",
-            "version": "v2.6.1",
+            "version": "v2.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/constant_time_encoding.git",
-                "reference": "d6e1d5d0fb2458dfdd7018ec2f74be120353a3b9"
+                "reference": "c1b1d82d109846ba58a4664dc5480c69ad2fc097"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/d6e1d5d0fb2458dfdd7018ec2f74be120353a3b9",
-                "reference": "d6e1d5d0fb2458dfdd7018ec2f74be120353a3b9",
+                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/c1b1d82d109846ba58a4664dc5480c69ad2fc097",
+                "reference": "c1b1d82d109846ba58a4664dc5480c69ad2fc097",
                 "shasum": ""
             },
             "require": {
@@ -2126,7 +2126,7 @@
                 "issues": "https://github.com/paragonie/constant_time_encoding/issues",
                 "source": "https://github.com/paragonie/constant_time_encoding"
             },
-            "time": "2022-06-11T00:43:46+00:00"
+            "time": "2022-06-13T05:29:16+00:00"
         },
         {
             "name": "paragonie/random_compat",
