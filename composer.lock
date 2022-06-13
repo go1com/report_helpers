@@ -946,19 +946,21 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/go1com/util.git",
-                "reference": "0031a9321aec19cc2feb758289de7e321e93ba88"
+                "reference": "8391ab92add4fd6f6f1a1b5893ce105ee041e3d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/go1com/util/zipball/0031a9321aec19cc2feb758289de7e321e93ba88",
-                "reference": "0031a9321aec19cc2feb758289de7e321e93ba88",
+                "url": "https://api.github.com/repos/go1com/util/zipball/8391ab92add4fd6f6f1a1b5893ce105ee041e3d8",
+                "reference": "8391ab92add4fd6f6f1a1b5893ce105ee041e3d8",
                 "shasum": ""
             },
             "require": {
                 "doctrine/cache": "^v1.6.0",
                 "go1.core/util": "dev-master",
+                "go1.libraries/notify.util": "dev-master",
                 "go1/app": "dev-master",
                 "go1/edge": "^0.3",
+                "go1/elasticsearch-compat": "dev-master",
                 "go1/util_core": "dev-master",
                 "go1/util_core_clients": "dev-master",
                 "guzzlehttp/guzzle": "^7.0.1",
@@ -998,7 +1000,7 @@
                 "issues": "https://github.com/go1com/util/issues",
                 "source": "https://github.com/go1com/util/tree/master"
             },
-            "time": "2021-12-10T10:12:25+00:00"
+            "time": "2022-06-13T04:16:32+00:00"
         },
         {
             "name": "go1/util_core",
